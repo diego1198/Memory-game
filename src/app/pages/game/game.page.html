@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar color="app-high">
+    <ion-title>GAME</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card class="card-logo" [hidden]="!visible">
+    <ion-card-header>
+      <ion-card-title>Seleccione la dificultad:</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col align-self-center>
+            <ion-button expand="block" color="app" (click)="selectEasy()">Facil</ion-button>
+            <ion-button expand="block" color="app-low" (click)="selectMedium()">Normal</ion-button>
+            <ion-button expand="block" color="app-oposite" (click)="selectHard()">Dificil</ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+  <ion-grid [hidden]="visible">
+    <ion-row *ngFor="let row of matriz" class="ion-align-items-center">
+      <ion-col *ngFor="let item of row.cols" class="ion-align-self-center">{{row.row}}{{item}}</ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-grid [hidden]="visible">
+    <ion-row>
+      <ion-col align-self-center>
+        <ion-button expand="block" color="app-high" (click)="selectLevel()">Seleccionar Nivel</ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
