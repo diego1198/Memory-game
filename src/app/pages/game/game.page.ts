@@ -23,6 +23,14 @@ export class GamePage implements OnInit {
 
   public cards: any[];
 
+  public cardPulsar = new Array(-1, -1);
+
+  public intents = 0;
+
+  public asserts = 0;
+
+  public pause = false;
+
   constructor() {}
 
   ngOnInit() {
@@ -61,9 +69,64 @@ export class GamePage implements OnInit {
     return Math.floor(Math.random() * this.MaxFichas);
   }
 
-  showImage(row,col,index){
-    console.log(row,col, index, this.cards)
-    this.matriz[row].cols[col].img_oculta = this.gImages[this.cards[index]].src;
+  showImage(row, col, index) {
+    console.log(index, this.cards);
+    if (this.matriz[row].cols[col].img_oculta === this.img_hidden) {
+      this.matriz[row].cols[col].img_oculta = this.gImages[
+        this.cards[index]
+      ].src;
+      if (this.cardPulsar[0] === -1) {
+        this.cardPulsar[0] = index;
+      } else {
+        this.cardPulsar[1] = index;
+      }
+    }
+    this.check();
+  }
+
+  check() {
+    if (this.pause || this.cardPulsar[1] === -1) {
+      return;
+    }
+
+    this.intents++;
+    console.log(this.onlyOdd(this.cards[this.cardPulsar[0]]),this.onlyOdd(this.cardPulsar[1]));
+    if (
+      this.onlyOdd(this.cards[this.cardPulsar[0]]) === this.onlyOdd(this.cards[this.cardPulsar[1]])
+    ) {
+      console.log("acerto");
+      this.asserts++;
+      if (this.asserts * 2 === this.MaxFichas) {
+      }
+      this.cardPulsar[0] = -1;
+      this.cardPulsar[1] = -1;
+    } else {
+      this.pause = true;
+      setTimeout(() => {
+        this.restartPairCard();
+      }, 1000);
+    }
+  }
+
+  restartPairCard() {
+    this.pause = false;
+    for (let i = 0; i < this.matriz.length; i++) {
+      for (let j = 0; j < this.matriz[i].cols.length; j++) {
+        if (
+          this.matriz[i].cols[j].index === this.cardPulsar[0] ||
+          this.matriz[i].cols[j].index === this.cardPulsar[1]
+        ) {
+          this.matriz[i].cols[j].img_oculta = this.img_hidden;
+        }
+      }
+    }
+
+    this.cardPulsar[0] = -1;
+    this.cardPulsar[1] = -1;
+  }
+
+  onlyOdd(n) {
+    return n % 2 === 0 ? n : n - 1;
   }
 
   generateArray() {
@@ -77,7 +140,7 @@ export class GamePage implements OnInit {
         colums.push({
           col,
           img_oculta: this.img_hidden,
-          index: i
+          index: i,
         });
         i++;
       }
@@ -89,22 +152,22 @@ export class GamePage implements OnInit {
   }
 
   selectEasy() {
-    this.col = 2;
-    this.row = 2;
+    this.col = 3;
+    this.row = 4;
     this.visible = false;
     this.generateArray();
   }
 
   selectMedium() {
-    this.col = 2;
+    this.col = 5;
     this.row = 4;
     this.visible = false;
     this.generateArray();
   }
 
   selectHard() {
-    this.col = 2;
-    this.row = 6;
+    this.col = 4;
+    this.row = 5;
     this.visible = false;
     this.generateArray();
   }
