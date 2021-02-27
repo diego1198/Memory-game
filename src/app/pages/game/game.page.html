@@ -22,6 +22,30 @@
     </ion-card-content>
   </ion-card>
   <ion-grid [hidden]="visible">
+    <ion-row [hidden]="startGame">
+      <ion-col size="6">
+        <ion-button (click)="start()" expand="block"  shape="round" color="primary">
+          Iniciar
+        </ion-button>
+      </ion-col>
+      <ion-col size="6">
+        <ion-button (click)="seeCards()" expand="block"  shape="round" color="secondary">
+          Mostrar: {{timesSeeCards}}
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-grid [hidden]="visible">
+    <ion-row>
+      <ion-col size="6">
+        <ion-label>Intentos:</ion-label>
+        <ion-input type="text" [(ngModel)]="intents"></ion-input>
+      </ion-col>
+      <ion-col size="6">
+        <ion-label>Aciertos</ion-label>
+        <ion-input type="text" [(ngModel)]="hits"></ion-input>
+      </ion-col>
+    </ion-row>
     <ion-row *ngFor="let row of matriz" class="ion-align-items-center">
       <ion-col *ngFor="let item of row.cols" class="ion-align-self-center"><!-- {{row.row}}{{item.col}} -->
         <img src="{{item.img_oculta}}" alt="" (click)="showImage(row.row,item.col,item.index)">
@@ -35,4 +59,5 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+  
 </ion-content>

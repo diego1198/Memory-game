@@ -1,6 +1,6 @@
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { ThisReceiver } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
-import { cpuUsage } from 'process';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-game',
@@ -11,7 +11,7 @@ export class GamePage implements OnInit {
   public col = 0;
   public row = 0;
   public route = '../../assets/images/img';
-  public img_hidden = '../../assets/images/memory.gif';
+  public imgHidden = '../../assets/images/memory.gif';
   public ext = '.jpg';
   public matriz = [];
 
@@ -27,11 +27,15 @@ export class GamePage implements OnInit {
 
   public intents = 0;
 
-  public asserts = 0;
+  public hits = 0;
 
   public pause = false;
 
-  constructor() {}
+  public startGame = false;
+
+  public timesSeeCards = 3;
+
+  constructor(private alertController: AlertController) {}
 
   ngOnInit() {
     this.generateArray();
@@ -70,18 +74,25 @@ export class GamePage implements OnInit {
   }
 
   showImage(row, col, index) {
-    console.log(index, this.cards);
-    if (this.matriz[row].cols[col].img_oculta === this.img_hidden) {
-      this.matriz[row].cols[col].img_oculta = this.gImages[
-        this.cards[index]
-      ].src;
-      if (this.cardPulsar[0] === -1) {
-        this.cardPulsar[0] = index;
-      } else {
-        this.cardPulsar[1] = index;
+    if (this.startGame) {
+      if (this.matriz[row].cols[col].img_oculta === this.imgHidden) {
+        this.matriz[row].cols[col].img_oculta = this.gImages[
+          this.cards[index]
+        ].src;
+        if (this.cardPulsar[0] === -1) {
+          this.cardPulsar[0] = index;
+        } else {
+          this.cardPulsar[1] = index;
+        }
       }
+      this.check();
+    } else {
+      this.presentAlert(
+        'Recordatorio',
+        'Primero debes iniciar el juego',
+        'Pulsa en el botón iniciar'
+      );
     }
-    this.check();
   }
 
   check() {
@@ -90,13 +101,18 @@ export class GamePage implements OnInit {
     }
 
     this.intents++;
-    console.log(this.onlyOdd(this.cards[this.cardPulsar[0]]),this.onlyOdd(this.cardPulsar[1]));
+    console.log(
+      this.onlyOdd(this.cards[this.cardPulsar[0]]),
+      this.onlyOdd(this.cardPulsar[1])
+    );
     if (
-      this.onlyOdd(this.cards[this.cardPulsar[0]]) === this.onlyOdd(this.cards[this.cardPulsar[1]])
+      this.onlyOdd(this.cards[this.cardPulsar[0]]) ===
+      this.onlyOdd(this.cards[this.cardPulsar[1]])
     ) {
-      console.log("acerto");
-      this.asserts++;
-      if (this.asserts * 2 === this.MaxFichas) {
+      console.log('acerto');
+      this.hits++;
+      if (this.hits * 2 === this.MaxFichas) {
+        this.presentAlertConfirm();
       }
       this.cardPulsar[0] = -1;
       this.cardPulsar[1] = -1;
@@ -116,7 +132,7 @@ export class GamePage implements OnInit {
           this.matriz[i].cols[j].index === this.cardPulsar[0] ||
           this.matriz[i].cols[j].index === this.cardPulsar[1]
         ) {
-          this.matriz[i].cols[j].img_oculta = this.img_hidden;
+          this.matriz[i].cols[j].img_oculta = this.imgHidden;
         }
       }
     }
@@ -139,7 +155,7 @@ export class GamePage implements OnInit {
       for (let col = 0; col < this.col; col++) {
         colums.push({
           col,
-          img_oculta: this.img_hidden,
+          img_oculta: this.imgHidden,
           index: i,
         });
         i++;
@@ -151,9 +167,43 @@ export class GamePage implements OnInit {
     }
   }
 
+  start() {
+    this.startGame = true;
+  }
+
+  seeCards() {
+    if (this.timesSeeCards > 0) {
+      let k = 0;
+      for (let i = 0; i < this.matriz.length; i++) {
+        for (let j = 0; j < this.matriz[i].cols.length; j++) {
+          this.matriz[i].cols[j].img_oculta = this.gImages[this.cards[k]].src;
+          k++;
+        }
+      }
+
+      setTimeout(() => {
+        for (let i = 0; i < this.matriz.length; i++) {
+          for (let j = 0; j < this.matriz[i].cols.length; j++) {
+            this.matriz[i].cols[j].img_oculta = this.imgHidden;
+          }
+        }
+      }, 2000);
+
+      this.timesSeeCards--;
+    } else {
+      this.presentAlert(
+        'Alerta',
+        'Ya has agotado tus vistas al tablero',
+        'Solo tienes 3 vistazos'
+      );
+    }
+  }
+
   selectEasy() {
     this.col = 3;
     this.row = 4;
+    this.intents = 0;
+    this.hits = 0;
     this.visible = false;
     this.generateArray();
   }
@@ -161,6 +211,8 @@ export class GamePage implements OnInit {
   selectMedium() {
     this.col = 5;
     this.row = 4;
+    this.intents = 0;
+    this.hits = 0;
     this.visible = false;
     this.generateArray();
   }
@@ -168,11 +220,51 @@ export class GamePage implements OnInit {
   selectHard() {
     this.col = 4;
     this.row = 5;
+    this.intents = 0;
+    this.hits = 0;
     this.visible = false;
     this.generateArray();
   }
 
   selectLevel() {
     this.visible = true;
+  }
+
+  async presentAlertConfirm() {
+    const alert = await this.alertController.create({
+      cssClass: 'my-custom-class',
+      header: 'Juego completado!',
+      message: '<strong>Felicidades!!</strong>!!!',
+      buttons: [
+        {
+          text: 'Terminar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            console.log('Confirm Cancel: blah');
+          },
+        },
+        {
+          text: 'Volver',
+          handler: () => {
+            this.selectLevel();
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
+
+  async presentAlert(header, sub, message) {
+    const alert = await this.alertController.create({
+      cssClass: 'my-custom-class',
+      header: header,
+      subHeader: sub,
+      message: message,
+      buttons: ['OK'],
+    });
+
+    await alert.present();
   }
 }
