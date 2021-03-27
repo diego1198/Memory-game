@@ -10,7 +10,7 @@ import { AlertController } from '@ionic/angular';
 export class GamePage implements OnInit {
   public col = 0;
   public row = 0;
-  public route = '../../assets/images/img';
+  public route = '';
   public imgHidden = '../../assets/images/memory.gif';
   public ext = '.jpg';
   public matriz = [];
@@ -205,16 +205,23 @@ export class GamePage implements OnInit {
     this.intents = 0;
     this.hits = 0;
     this.visible = false;
+    this.startGame = false;
+    this.route = '../../assets/images/easy/img';
     this.generateArray();
+    this.timesSeeCards = 3;
   }
 
   selectMedium() {
-    this.col = 5;
+    this.col = 4;
     this.row = 4;
     this.intents = 0;
     this.hits = 0;
     this.visible = false;
+    this.startGame = false;
+    this.route = '../../assets/images/medium/img';
     this.generateArray();
+    this.timesSeeCards = 3;
+
   }
 
   selectHard() {
@@ -223,7 +230,10 @@ export class GamePage implements OnInit {
     this.intents = 0;
     this.hits = 0;
     this.visible = false;
+    this.startGame = false;
+    this.route = '../../assets/images/hard/img';
     this.generateArray();
+    this.timesSeeCards = 3;
   }
 
   selectLevel() {
@@ -259,9 +269,9 @@ export class GamePage implements OnInit {
   async presentAlert(header, sub, message) {
     const alert = await this.alertController.create({
       cssClass: 'my-custom-class',
-      header: header,
+      header,
       subHeader: sub,
-      message: message,
+      message,
       buttons: ['OK'],
     });
 
