@@ -2,6 +2,8 @@ import { ThisReceiver } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 
+import { NativeAudio } from '@ionic-native/native-audio/ngx';
+
 @Component({
   selector: 'app-game',
   templateUrl: './game.page.html',
@@ -35,7 +37,18 @@ export class GamePage implements OnInit {
 
   public timesSeeCards = 3;
 
-  constructor(private alertController: AlertController) {}
+  constructor(
+    private alertController: AlertController,
+    private nativeAudio: NativeAudio
+  ) {
+    this.nativeAudio.preloadComplex(
+      'game',
+      '../../assets/sounds/game-sound.wav',
+      1,
+      1,
+      0
+    );
+  }
 
   ngOnInit() {
     this.generateArray();
@@ -55,12 +68,14 @@ export class GamePage implements OnInit {
     for (let index = 0; index < this.MaxFichas; index++) {
       this.cards[index] = index;
     }
-    let nUno: number, nDos: number, nTemp: number;
+    let nUno: number;
+    let nDos: number;
+    let nTemp: number;
 
     let i = 100;
     while (i--) {
-      nUno = this.azar(); //aleatorio para separar las parejas
-      nDos = this.azar(); //aleatorio para separar la pareja de la anterior
+      nUno = this.azar(); // aleatorio para separar las parejas
+      nDos = this.azar(); // aleatorio para separar la pareja de la anterior
       if (nDos !== nUno) {
         nTemp = this.cards[nUno];
         this.cards[nUno] = this.cards[nDos];
@@ -209,6 +224,7 @@ export class GamePage implements OnInit {
     this.route = '../../assets/images/easy/img';
     this.generateArray();
     this.timesSeeCards = 3;
+    this.nativeAudio.loop('game');
   }
 
   selectMedium() {
@@ -221,7 +237,7 @@ export class GamePage implements OnInit {
     this.route = '../../assets/images/medium/img';
     this.generateArray();
     this.timesSeeCards = 3;
-
+    this.nativeAudio.loop('game');
   }
 
   selectHard() {
@@ -234,10 +250,12 @@ export class GamePage implements OnInit {
     this.route = '../../assets/images/hard/img';
     this.generateArray();
     this.timesSeeCards = 3;
+    this.nativeAudio.loop('game');
   }
 
   selectLevel() {
     this.visible = true;
+    this.nativeAudio.stop('game');
   }
 
   async presentAlertConfirm() {
